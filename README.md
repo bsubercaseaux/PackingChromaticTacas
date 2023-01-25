@@ -1,3 +1,16 @@
-# The Packing Chromatic Number of the Infinite Square Grid is 15", accepted at TACAS'2023.
+# The Packing Chromatic Number of the Infinite Square Grid is 15. (TACAS'2023)
+
+by Bernardo Subercaseaux and Marijn J. H. Heule.
+
+---
+
+### Required software
+
+
+
+
+### Instructions
+
+
 
 
