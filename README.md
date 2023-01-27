@@ -4,7 +4,7 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 
 ---
 
-### Required software
+## Required software
 
 1. `Python 3.10.0` 
 2. Python libraries specified in the 'requirements.txt' file. (Run `pip3 install -r requirements.txt`).
@@ -12,9 +12,9 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 4. `ppr2drat`, which shall be obtained from [https://github.com/marijnheule/ppr2drat](https://github.com/marijnheule/ppr2drat).
 
 
-### Instructions
+## Instructions
 
-1. **Direct Encoding**
+###  **1. Direct Encoding**
 
 To use the direct encoding one must run the file `src/direct.py`. 
 This `src/direct.py` file takes several CLI arguments. 
@@ -81,13 +81,13 @@ p cnf 935 21220
 ```
 
 
-2. **Plus Encoding**
+### **2. Plus Encoding**
 
 The plus encoding needs to be executed in two separate steps.
 The first step consists of specifying the different regions $S_i$ of the encoding (a process we call _"placing"_), and the second part takes the specification of the regions $S_i$ (we call this a _"placement"_) and produces the CNF formula.
 
 **Note**: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
 
-3. Cube And Conquer Split
+### **3. Cube And Conquer Split**
 
-4. Verification
+### **4. Verification**
