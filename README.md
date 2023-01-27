@@ -8,7 +8,7 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 
 1. `Python 3.10.0` 
 2. Python libraries specified in the `requirements.txt` file. (Run `pip3 install -r requirements.txt`).
-3. `CaDiCaL`
+3. CaDiCaL.
 4. `ppr2drat`, which shall be obtained from [https://github.com/marijnheule/ppr2drat](https://github.com/marijnheule/ppr2drat).
 
 
