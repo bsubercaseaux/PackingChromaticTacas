@@ -18,11 +18,17 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 
 To use the direct encoding one must run the file `src/direct.py`. 
 This `src/direct.py` file takes several CLI arguments. 
-For now, the documentation will only cover the subset required to reproduce the results in our paper.
+For now, the documentation will only cover the subset required to reproduce the results in our paper. For a complete list of arguments, it suffices to run
 
-To generate the direct encoding on $D_r$ (in DIMACS format), with colors $\{1, \ldots, k\}$ and assigning color $c$ to the center, resulting in a file `direct-<r>-<k>-<c>.cnf`, run:
+```
+python3 direct.py --help
+```
 
-```python3 direct.py -r <r> -k <k> -c <c> -o direct-<r>-<k>-<c>.cnf```
+To generate the direct encoding on $D_r$ (in DIMACS format), with colors $\lbrace 1, \ldots, k \rbrace$ and assigning color $c$ to the center, resulting in a file `direct-<r>-<k>-<c>.cnf`, run:
+
+```
+python3 direct.py -r <r> -k <k> -c <c> -o direct-<r>-<k>-<c>.cnf
+```
 
 So for example:
 
@@ -47,9 +53,12 @@ p cnf 935 21086
 ```
 
 This formula is included as an example in the `formulas` sub-folder.
+
 To add the ALOD clauses, it suffices to add `-a 1` to the Python3 command.
+
 To do symmetry breaking, it suffices to add `-S 1` to the Python3 command.
-So for example, by incorporating both, and checking the resulting file:
+
+For example, by incorporating both, and checking the resulting file:
 
 ```
 python3 direct.py -r 6 -k 11 -c 6 -a 1 -S 1 -o direct-6-11-6-S-A.cnf
@@ -75,7 +84,7 @@ p cnf 935 21220
 2. **Plus Encoding**
 
 The plus encoding needs to be executed in two separate steps.
-The first step consists of specifying the different regions S_i of the encoding (a process we call _"placing"_), and the second part takes the specification of the regions S_i (we call this a _"placement"_) and produces the CNF formula.
+The first step consists of specifying the different regions $S_i$ of the encoding (a process we call _"placing"_), and the second part takes the specification of the regions $S_i$ (we call this a _"placement"_) and produces the CNF formula.
 
 **Note**: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
 
