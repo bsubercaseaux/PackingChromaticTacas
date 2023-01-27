@@ -65,7 +65,7 @@ python3 direct.py -r 6 -k 11 -c 6 -a 1 -S 1 -o direct-6-11-6-S-A.cnf
 head direct-6-11-6-S-A.cnf
 ```
 
-we obtain the following output:
+We obtain the following output:
 
 ```
 p cnf 935 21220
@@ -88,6 +88,79 @@ The first step consists of specifying the different regions $S_i$ of the encodin
 
 **Note**: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
 
-### **3. Cube And Conquer Split**
+2.1. **Placing**
 
-### **4. Verification**
+To create a placement for radius $r$ and $k$ colors, run the following command:
+
+```
+python3 interactive_encoder.py -r <r> -k <k>
+```
+
+As a result, a new window with a GUI should pop up.
+For example, for $r = 6, k = 11$, it should look like this:
+
+
+![Screenshot of the interactive placement encoder for r=6, k=11.](/img/ss-placing.png?raw=true "Interactive Encoder")
+
+This interface is composed of several parts that we explain now.
+
+Firstly, at all points in time there is a single color $a$ (in $\lbrace 1, \ldots, k \rbrace$) that is considered _"active"_. This means that the regions $S_i$ to create will be associated to color $a$, thus creating a regional variable $r_{S_i, a}$. The default active color is $4$, as described in our paper, we do not create regional variables for colors $\lbrace 1, 2, 3\rbrace$.
+
+At all points in time there is also an active _"shape"_, which describes the geometry of the regions $S_i$ to create. More precisely, a shape is an ordered set of 2D vectors $v_1, \ldots, v_m$. For example, the active shape by default is the _"plus"_ shape, which consists of the 2D vectors: $(0, 0), \; (0, -1), \; (0, 1), \; (-1, 0), \; (1, 0)$.
+
+A _"region"_ $S_i$ is then defined by a _"shape"_ $H$ and a _"center"_ $c$. A _"center_" is simply a 2D point. The region $S_i$ is defined simply as
+
+$$
+    \lbrace c + \vec{v} \mid \vec{v} \in H \rbrace.
+$$
+
+In practice, to create a new region $S_i$, it suffices only to specify its center $c$, as the shape $H$ will be the current active shape (i.e., a "+" by default). To specify its center it suffices to click it on the GUI.
+The next two images illustrates the _before and after_ of creating a new region.
+
+
+In order to simplify the job of creating a placement, and given that it's natural for a placement to use the same regions for different colors, the GUI presents a functionality that allows to replicate the regions $S_i$ used for the active colors to other colors. In particular, by specifying a range with notation `<start>-<end>` on the `Replicate` textbox, the current regions for the active color will induce new regional variables for every color in the specified range.
+
+For example, once we have placed the following regions for the active color $4$:
+
+
+We can replicate them to colors $5$ through $11$ simply by typing `5-11` on the textbox and clicking on replicate.
+
+Once a placement is complete, we need to export it as a file by clicking the `Export placement` button. Then we will simply select a filename for it, where the extension does not matter. For example, in this case we could name it `placement-6-11-plus`. 
+
+2.2 **From placement to encoding**.
+
+Once we have the desired placement file, we will simply use the following Python command to generate an encoding from it.
+
+```
+python3 from_placement.py -i <placement file> -o <output file> -r <r> -k <k>
+```
+
+Continuing with our example:
+
+```
+python3 from_pacement.py -i placements/placement-6-11-plus -o p-6-11-plus.cnf -r 6 -k 11
+```
+generates `p-6-11-plus.cnf`. Now it's a good time to test the advantages of our work. By running
+
+```
+cadical d-6-11.cnf
+```
+we obtain an UNSAT result after roughly X hours:
+
+
+By using the plus encoding instead, running
+
+```
+cadical p-6-11-plus.cnf
+```
+we obtain the UNSAT result after roughly 10 minutes:
+
+![Screenshot displaying the time statistics for a CaDiCaL run on p-6-11-plus.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
+
+_Note_: Both experiments have been run on my personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
+
+_Note 2_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
+
+3. **Cube and Conquer split**
+
+4. **Verification**

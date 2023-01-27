@@ -132,8 +132,9 @@ print(f'# clauses = {len(clauses)}')
 cnf.to_file(output_file + '.cnf')
 
 if singlecolor is None:
-    cubes = structurer.cubes(colors_to_split, positive_lits, placement_map, n_new_vars_to_split, reverse_cubes, center_force)
-    print(f'# cubes = {len(cubes)}')
-    cubes_to_file(clauses, cubes, output_file + '.icnf')
+    if colors_to_split is not None:
+        cubes = structurer.cubes(colors_to_split, positive_lits, placement_map, n_new_vars_to_split, reverse_cubes, center_force)
+        print(f'# cubes = {len(cubes)}')
+        cubes_to_file(clauses, cubes, output_file + '.icnf')
     proof_to_file(proof, output_file + '.drat')
     proof_to_file(alod_proof, output_file + '-alod.drat')

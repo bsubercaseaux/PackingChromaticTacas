@@ -73,9 +73,6 @@ class InteractiveEncoder:
         # tkinter stuff starts :)
         self.window = tkinter.Tk()
         self.window.title("Interactive Encoder")
-        self.window.overrideredirect(True)
-        self.window.overrideredirect(False)
-        self.window.attributes('-fullscreen',True)
 
         # in-window title
         self.in_window_title = tkinter.Label(
@@ -170,7 +167,6 @@ class InteractiveEncoder:
 
     def click(self, event):
         w, h = self.canvas.winfo_reqwidth(), self.canvas.winfo_reqheight()
-        print(f'w = {w}, h = {h}')
         rel_x = event.x - w//2+self.rec_side//2
         rel_y = event.y - h//2-self.rec_side//2
         sq_relx, sq_rely  = rel_x // self.rec_side, (-1*rel_y) // self.rec_side
@@ -247,11 +243,9 @@ class InteractiveEncoder:
         for color in range(bgn, end+1):
             self.new_vars_per_color[color] = list(self.new_vars_per_color[self.active_color])
         self.update_clauses()
-        print('updated!')
 
     def export(self):
         filename = asksaveasfilename()
-        print(f'filename = {filename}')
         self.canvas.postscript(file = filename + '.eps') 
         img = Image.open(filename + '.eps')
         img.save(filename + '.png', 'png') 
