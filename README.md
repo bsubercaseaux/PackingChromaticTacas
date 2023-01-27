@@ -106,9 +106,9 @@ This interface is composed of several parts that we explain now.
 
 Firstly, at all points in time there is a single color $a$ (in $\lbrace 1, \ldots, k \rbrace$) that is considered _"active"_. This means that the regions $S_i$ to create will be associated to color $a$, thus creating a regional variable $r_{S_i, a}$. The default active color is $4$, as described in our paper, we do not create regional variables for colors $\lbrace 1, 2, 3\rbrace$.
 
-At all points in time there is also an active _"shape"_, which describes the geometry of the regions $S_i$ to create. More precisely, a shape is an ordered set of 2D vectors $v_1, \ldots, v_m$. For example, the active shape by default is the _"plus"_ shape, which consists of the 2D vectors: $(0, 0), \; (0, -1), \; (0, 1), \; (-1, 0), \; (1, 0)$.
+At all points in time there is also an active _"shape"_, which describes the geometry of the regions $S_i$ to create. More precisely, a shape is an ordered set of 2D vectors $\vec{v}_1, \ldots, \vec{v}_m$. For example, the active shape by default is the _"plus"_ shape, which consists of the 2D vectors: $(0, 0),  (0, -1),  (0, 1),   (-1, 0),   (1, 0)$.
 
-A _"region"_ $S_i$ is then defined by a _"shape"_ $H$ and a _"center"_ $c$. A _"center_" is simply a 2D point. The region $S_i$ is defined simply as
+A _"region"_ $S_i$ is then defined by a _"shape"_ $H$ and a _"center"_ $c$. A _"center_" is simply a 2D point. The region $S_i$ is defined simply as the following set of points:
 
 $$
     \lbrace c + \vec{v} \mid \vec{v} \in H \rbrace.
