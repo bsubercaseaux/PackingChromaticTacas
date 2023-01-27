@@ -42,6 +42,7 @@ if verbose > 0:
     print(f" forcing center to  = {min(radius, colors) if center_force == 0 else center_force}")
     print(f" units = {units}")
     print(f" chessboard = {chessboard}")
+    print(f" symmetry = {symmetry}")
 
 
 structurer = Structure(radius, colors, symmetry)
