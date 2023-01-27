@@ -1,0 +1,7 @@
+matplotlib==3.4.3
+networkx==2.8.3
+numpy==1.21.2
+Pillow==9.4.0
+pysat==3.0.6
+python_sat==0.1.7.dev12
+scipy==1.8.0
