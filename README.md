@@ -155,7 +155,7 @@ By using the plus encoding instead, running
 ```
 cadical p-6-11-plus.cnf
 ```
-we obtain the UNSAT result after roughly 10 minutes:
+we obtain the UNSAT result after roughly 11 minutes:
 
 ![Screenshot displaying the time statistics for a CaDiCaL run on p-6-11-plus.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
 
@@ -177,15 +177,13 @@ this will generate 7776 cubes, in the file `p-6-11-plus-P5R5T5.icnf`, which can 
 ```
 ilingeling p-6-11-plus-P5R5T5.icnf 8 -v 
 ```
-to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above a minute!
+to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above a minute! Also, note that even the total runtime is better than before!
 
 ![Screenshot displaying the time statistics for an iLingeling run on p-6-11-plus-P5R5T5.icnf](/img/time-cubes-6-11.png?raw=true "Time Statistics")
 
 
 ## TODO
 
-- [] Add a section on Symmetry Breaking in this README
-- [] Add a section on Verification in this README
-- [] Add more example formulas and placement files
-
-TODO
+- [ ] Add a section on Symmetry Breaking in this README
+- [ ] Add a section on Verification in this README
+- [ ] Add more example formulas and placement files
