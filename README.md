@@ -123,6 +123,8 @@ In order to simplify the job of creating a placement, and given that it's natura
 For example, once we have placed the following regions for the active color $4$:
 
 
+![Screenshot of the interactive placement encoder for r=6, k=11.](/img/ss-placing-4.png?raw=true "Interactive Encoder")
+
 We can replicate them to colors $5$ through $11$ simply by typing `5-11` on the textbox and clicking on replicate.
 
 Once a placement is complete, we need to export it as a file by clicking the `Export placement` button. Then we will simply select a filename for it, where the extension does not matter. For example, in this case we could name it `placement-6-11-plus`. 
@@ -138,7 +140,7 @@ python3 from_placement.py -i <placement file> -o <output file> -r <r> -k <k>
 Continuing with our example:
 
 ```
-python3 from_pacement.py -i placements/placement-6-11-plus -o p-6-11-plus.cnf -r 6 -k 11
+python3 from_pacement.py -i ../placements/placement-6-11-plus -o p-6-11-plus.cnf -r 6 -k 11
 ```
 generates `p-6-11-plus.cnf`. Now it's a good time to test the advantages of our work. By running
 
@@ -157,10 +159,33 @@ we obtain the UNSAT result after roughly 10 minutes:
 
 ![Screenshot displaying the time statistics for a CaDiCaL run on p-6-11-plus.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
 
-_Note_: Both experiments have been run on my personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
+_Note_: Both experiments have been run on my (i.e., Bernardo) personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
 
 _Note 2_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
 
 3. **Cube and Conquer split**
 
-4. **Verification**
+To execute as well the PTR algorithm, is enough to specify the parameters $P$, $T$ and $R$ when running the `from_placement.py` file.
+
+For example, if we run the following command:
+
+```
+python3 from_placement.py -i ../placements/placement-6-11 -o p-6-11-plus-P5R5T5 -r 6 -k 11 -P 5 -T 5 -R 5
+```
+this will generate 7776 cubes, in the file `p-6-11-plus-P5R5T5.icnf`, which can then solve with any incremental solver. For example, using [iLingeling](https://github.com/arminbiere/lingeling), we can run:
+
+```
+ilingeling p-6-11-plus-P5R5T5.icnf 8 -v 
+```
+to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above a minute!
+
+![Screenshot displaying the time statistics for an iLingeling run on p-6-11-plus-P5R5T5.icnf](/img/time-cubes-6-11.png?raw=true "Time Statistics")
+
+
+## TODO
+
+- [] Add a section on Symmetry Breaking in this README
+- [] Add a section on Verification in this README
+- [] Add more example formulas and placement files
+
+TODO
