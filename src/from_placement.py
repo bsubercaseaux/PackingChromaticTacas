@@ -2,6 +2,7 @@ import json
 from pysat.formula import CNF
 import argparse
 import structured_api
+import os
 
 parser = argparse.ArgumentParser(description="Placement to encoding.")
 parser.add_argument('-r', '--radius', help='radius', type=int, required=True)
@@ -16,14 +17,13 @@ parser.add_argument('-T', '--splitcolors', type=int, help='number of colors to s
 parser.add_argument('-R', '--split', type=int, help='number of new variables to use for the split')
 parser.add_argument('-b', '--backcubes', help='puts cubes in reverse order', action='store_true')
 parser.add_argument('-S', '--symmetry', type=int,  help='enables symmetry breaking for the specified number of layers', default=0)
-parser.add_argument('-a', '--alod', type=int, help='enables ALOD clauses', default=0)
+parser.add_argument('-A', '--alod', type=int, help='enables ALOD clauses', default=0)
 parser.add_argument('-f', '--foreign', help='foreign clauses', action='store_true')
 parser.add_argument('--symver', help='name for the symmetry verification file', default=None)
 parser.add_argument('-B', '--borderones', type=int, help='maximum number of ones in the border', default=0)
 parser.add_argument('-C', '--chessboard', help='forces the chessboard pattern of 1s', action='store_true')
 parser.add_argument('--singlecolor', type=int, help='specify a single color for clauses', default=None)
 args = parser.parse_args()
-
 
 radius = args.radius
 n_colors = args.colors
@@ -47,6 +47,9 @@ singlecolor = args.singlecolor
 if verbose > 0:
     for v in vars(args):
         print(f'{v} = {getattr(args,v)}')
+
+
+basepath = os.path.basename(output_file)
 
 structurer = structured_api.Structure(radius, n_colors, symmetry)
 
@@ -77,7 +80,6 @@ if alod_clauses:
     clauses.extend(alod_cls)
     alod_proof = alod_cls
     
-
 if minimization:
     min_clauses = structurer.minimization_clauses()
     clauses.extend(min_clauses)
@@ -89,7 +91,7 @@ if foreign:
 
 if symmetry:
     symmetry_clauses = structurer.symmetry_breaking()
-    structurer.symmetry_verification('proofs/'+ output_file + ".symver" )
+    structurer.symmetry_verification('proofs/'+ basepath + ".symver" )
     clauses.extend(symmetry_clauses)
 
 if border_ones:
@@ -128,12 +130,12 @@ def proof_to_file(proof, proof_filename):
 
 cnf = CNF(from_clauses=clauses)
 print(f'# clauses = {len(clauses)}')
-cnf.to_file('formulas/' + output_file + '.cnf')
+cnf.to_file('formulas/' + basepath + '.cnf')
 
 if singlecolor is None:
     if colors_to_split is not None:
         cubes = structurer.cubes(colors_to_split, positive_lits, placement_map, n_new_vars_to_split, reverse_cubes, center_force)
         print(f'# cubes = {len(cubes)}')
-        cubes_to_file(clauses, cubes, 'formulas/' + output_file + '.icnf')
-    proof_to_file(proof, 'proofs/' + output_file + '.drat')
-    proof_to_file(alod_proof, 'proofs/' + output_file + '-alod.drat')
+        cubes_to_file(clauses, cubes, 'formulas/' + basepath + '.icnf')
+    proof_to_file(proof, 'proofs/' + basepath + '.drat')
+    proof_to_file(alod_proof, 'proofs/' + basepath + '-alod.drat')

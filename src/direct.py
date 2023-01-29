@@ -7,7 +7,7 @@ parser.add_argument('-r', '--radius', help='radius (or side for squares)', type=
 parser.add_argument('-k', '--colors', help='number of colors to be used', type=int, required=True)
 parser.add_argument('-g', '--geometry', help='geometry (square or diamond)',type=str, default="diamond")
 parser.add_argument('-v', '--verbose', action='count', default=0)
-parser.add_argument('-a', '--alod', type=int, help="adds ALOD clauses", default=0)
+parser.add_argument('-A', '--alod', type=int, help="adds ALOD clauses", default=0)
 parser.add_argument('-c', '--centerforce', type=int, help="value to which the center is forced (-1 for no forcing, 0 for min(r, c))", default=0)
 parser.add_argument('-u', '--units', help="allows introducing unit clauses, format is (i_1,j_1,c_1);...;(i_n, j_n, c_n)", default=None)
 parser.add_argument('--unit_ints', help="allows introducing unit clauses as ints, a string in quotes of ints separated by semi-colons", default=None)

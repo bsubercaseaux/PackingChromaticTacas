@@ -6,15 +6,16 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 
 ## Required software
 
-1. `Python 3.10.0` 
+1. `Python 3.10.0` (our code should work as well on slightly older versions of Python3, but this is the only one that has been tested). 
 2. Python libraries specified in the `requirements.txt` file. (Run `pip3 install -r requirements.txt`).
-3. CaDiCaL.
+3. `CaDiCaL` (or any other solve capable of generating DRAT unsatisfiability proofs).
 4. `ppr2drat`, which shall be obtained from [https://github.com/marijnheule/ppr2drat](https://github.com/marijnheule/ppr2drat).
 
+_Note 1_: the code and instructions presented here have only been tested in macOS (and indirectly on Linux). We do not foresee any obvious issues with running it on Windows. If you have tested this and it worked for you, let us know!
 
 ## Instructions
 
-Throughout these instructions, we show how to generate the different instances for $D_6$ with $11$ colors as a running example, while also showcasing the impact of the different optimizations.
+Throughout these instructions, we show how to generate the different instances for $D_6$ with $11$ colors as a running example, while also showcasing the impact of the different optimizations. For context, it took Ekstein et al. 120 days of computation to show that $\chi_\rho(\mathbb{Z}^2) \geq 12$, and by simply following this instructions one can prove this same result in around 35 seconds on a personal computer!
 
 ###  **1. Direct Encoding**
 
@@ -56,7 +57,7 @@ p cnf 935 21086
 
 This formula is included as an example in the `formulas` sub-folder.
 
-__Note__: when $c$, the center color is unspecified, the program takes $c := \min(r, k).$
+_Note 2_: when $c$, the center color is unspecified, the program takes $c := \min(r, k).$
 
 To add the ALOD clauses, it suffices to add `-A 1` to the Python3 command.
 
@@ -65,7 +66,7 @@ To do symmetry breaking, using 5 layers (as in the article), it suffices to add 
 For example, by incorporating both, and checking the resulting file:
 
 ```
-python3 src/direct.py -r 6 -k 11 -c 6 -a 1 -S 1 -o formulas/direct-6-11-6-A-S5
+python3 src/direct.py -r 6 -k 11 -c 6 -A 1 -S 1 -o formulas/direct-6-11-6-A-S5
 head formulas/direct-6-11-6-A-S5.cnf
 ```
 
@@ -90,7 +91,7 @@ p cnf 935 21220
 The plus encoding needs to be executed in two separate steps.
 The first step consists of specifying the different regions $S_i$ of the encoding (a process we call _"placing"_), and the second part takes the specification of the regions $S_i$ (we call this a _"placement"_) and produces the CNF formula.
 
-_Note_: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
+_Note 3_: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
 
 2.1. **Placing**
 
@@ -144,7 +145,7 @@ python3 src/from_placement.py -i <placement file> -o <output file> -r <r> -k <k>
 Continuing with our example:
 
 ```
-python3 src/from_pacement.py -i placements/placement-6-11-plus -o formulas/plus-6-11 -r 6 -k 11
+python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11 -r 6 -k 11
 ```
 generates `plus-6-11.cnf` in the `formulas` subfolder. Now it's a good time to test the advantages of our work.
 
@@ -164,16 +165,16 @@ from which we obtain the UNSAT result after roughly 11 minutes:
 
 ![Screenshot displaying the time statistics for a CaDiCaL run on plus-6-11.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
 
-_Note 2_: Both experiments have been run on my (i.e., Bernardo) personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
+_Note 4_: Both experiments have been run on my (i.e., Bernardo) personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
 
-_Note 3_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
+_Note 5_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
 
 
 To enable symmetry breaking for $5$ layers (the choice we make in the paper), we proceed exactly as with the direct encoder, by simply adding  the flag `-S 5`.
 So for example after running 
 
 ```
-python3 src/from_pacement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-S5 -r 6 -k 11 -S 5
+python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-S5 -r 6 -k 11 -S 5
 ```
 
 and then running
@@ -184,49 +185,71 @@ cadical formulas/plus-6-11-S5.cnf
 
 we obtain the following runtime:
 
+![Screenshot displaying the time statistics for a CaDiCaL run on plus-6-11-S5.cnf](/img/time-plus-symmetry.png?raw=true "Time Statistics")
+
 
 
 3. **Cube and Conquer split**
 
 To execute as well the PTR algorithm, is enough to specify the parameters $P$, $T$ and $R$ when running the `from_placement.py` file.
 
-For example, if we run the following command:
+For example, consider the following command, using all the different optimizations presented:
 
 ```
-python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-P5R5T5 -r 6 -k 11 -P 5 -T 5 -R 5
+python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-A-S5-P5T5R5 -r 6 -k 11 -A 1 -S 5 -P 5 -T 5 -R 5
 ```
-this will generate 7776 cubes, and store them in the file `formulas/plus-6-11-P5R5T5.icnf`, which can then be solved with any incremental solver. For example, using [iLingeling](https://github.com/arminbiere/lingeling), we can run:
+this will generate 7776 cubes, and store them in the file `formulas/plus-6-11-A-S5-P5T5R5.icnf`, which can then be solved with any incremental solver. For example, using [iLingeling](https://github.com/arminbiere/lingeling), we can run:
 
 ```
-ilingeling formulas/plus-6-11-P5R5T5.icnf 8 -v 
+ilingeling formulas/plus-6-11-A-S5-P5T5R5.icnf 8 -v 
 ```
-to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above a minute! Also, note that even the total runtime is better than before!
+to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above 30 seconds!
 
-![Screenshot displaying the time statistics for an iLingeling run on p-6-11-plus-P5R5T5.icnf](/img/time-cubes-6-11.png?raw=true "Time Statistics")
+![Screenshot displaying the time statistics for an iLingeling run on p-6-11-plus-A-S5-P5R5T5.icnf](/img/time-cubes-6-11.png?raw=true "Time Statistics")
 
 4. **Verification**
 
-Here we will cover how to verify a solution for $r = 6$, $k = 11$, using the plus encoding, symmetry breaking and the ALOD clauses.
+Here we will cover how to verify a solution for $r = 6$, $k = 11$, using the plus encoding, symmetry breaking and the ALOD clauses. In fact, by following the previous sections you have already started the verification process!
 
-When we run the encoding command:
+When we ran the encoding command:
 
 ```
 python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-A-S5 -r 6 -k 11 -a 1 -S 5
 ```
 
-several different verification files are automatically generated inside of the `formulas` subfolder:
+several different verification files were automatically generated inside of the `formulas` subfolder:
 
 - `plus-6-11-A-S5.cnf`
 - `plus-6-11-A-S5-alod.drat`
 - `plus-6-11-A-S5.symver`
 
+There is one more proof file we need: the proof of unsatisfiability for `formulas/plus-6-11-A-S5.cnf`. 
+We can obtain it with CaDiCaL by running:
+
 ```
-ppr2drat formulas/direct-6-11.cnf proofs/plus-6-11-A-S5.symver > proofs/proofsym-plus-6-11-A-S5.drat
-cat proofs/proofsym-plus-6-11-A-S5.drat proofs/plus-6-11-A-S5-alod.drat > cb1-plus-6-11-A-S5.drat
-cat cb1-plus-6-11-A-S5.drat proofs/plus-6-11-A-S5.drat > cb2-plus-6-11-A-S5.drat
 cadical formulas/plus-6-11-A-S5.cnf proofs/proof-sol-plus-6-11-A-S5.drat
-cat cb2-plus-6-11-A-S5.drat proofs/proof-sol-plus-6-11-A-S5.drat > proofs/final-plus-6-11-A-S5.drat
+```
+
+After obtaining that proof, we will combine all the proof files into a file one, which then well checked against the direct encoding (say `formulas/direct-6-11.cnf`). Let's proceed step by step.
+
+First, we can sue the command
+```
+ppr2drat formulas/direct-6-11.cnf proofs/plus-6-11-A-S5.symver > proofs/proof-sym-plus-6-11-A-S5.drat
+```
+to generate a DRAT proof of the symmetry breaking.
+Then, we combine the proofs (remember that the order here really matters! see paper).
+
+```
+cat proofs/proof-sym-plus-6-11-A-S5.drat proofs/plus-6-11-A-S5-alod.drat proofs/plus-6-11-A-S5.drat proofs/proof-sol-plus-6-11-A-S5.drat > final-plus-6-11-A-S5.drat
+```
+We have thus obtained a single final DRAT proof! We can verify it with:
+
+```
 drat-trim formulas/direct-6-11.cnf proofs/final-plus-6-11-A-S5.drat -f
 ```
 
+obtaining the following output:
 
+![Screenshot displaying the correct output of drat-trim on the final proof.](/img/drat-trim-verified.png?raw=true "Verified Proof")
+
+_Note 6_: the direct encoding is the only unverified part of our work. To address this, we offer two alternatives. On the one hand, as presented in the arXiv version of the paper, the direct encoding code can be made really minimalistic, in which case it becomes easy to manually inspect it. On the other hand, Yong Kiam Tan has made a `CakeML`-verified direct encoding.
