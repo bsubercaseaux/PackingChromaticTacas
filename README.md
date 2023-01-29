@@ -14,6 +14,8 @@ by Bernardo Subercaseaux and Marijn J. H. Heule.
 
 ## Instructions
 
+Throughout these instructions, we show how to generate the different instances for $D_6$ with $11$ colors as a running example, while also showcasing the impact of the different optimizations.
+
 ###  **1. Direct Encoding**
 
 To use the direct encoding one must run the file `src/direct.py`. 
@@ -21,20 +23,20 @@ This `src/direct.py` file takes several CLI arguments.
 For now, the documentation will only cover the subset required to reproduce the results in our paper. For a complete list of arguments, it suffices to run
 
 ```
-python3 direct.py --help
+python3 src/direct.py --help
 ```
 
 To generate the direct encoding on $D_r$ (in DIMACS format), with colors $\lbrace 1, \ldots, k \rbrace$ and assigning color $c$ to the center, resulting in a file `direct-<r>-<k>-<c>.cnf`, run:
 
 ```
-python3 direct.py -r <r> -k <k> -c <c> -o direct-<r>-<k>-<c>.cnf
+python3 src/direct.py -r <r> -k <k> -c <c> -o formulas/direct-<r>-<k>-<c>
 ```
 
 So for example:
 
 ```
-python3 direct.py -r 6 -k 11 -c 6 -o direct-6-11-6.cnf
-head direct-6-11-6.cnf
+python3 src/direct.py -r 6 -k 11 -c 6 -o formulas/direct-6-11-6
+head formulas/direct-6-11-6.cnf
 ```
 
 should generate the following output:
@@ -54,15 +56,17 @@ p cnf 935 21086
 
 This formula is included as an example in the `formulas` sub-folder.
 
-To add the ALOD clauses, it suffices to add `-a 1` to the Python3 command.
+__Note__: when $c$, the center color is unspecified, the program takes $c := \min(r, k).$
 
-To do symmetry breaking, it suffices to add `-S 1` to the Python3 command.
+To add the ALOD clauses, it suffices to add `-A 1` to the Python3 command.
+
+To do symmetry breaking, using 5 layers (as in the article), it suffices to add `-S 5` to the Python3 command.
 
 For example, by incorporating both, and checking the resulting file:
 
 ```
-python3 direct.py -r 6 -k 11 -c 6 -a 1 -S 1 -o direct-6-11-6-S-A.cnf
-head direct-6-11-6-S-A.cnf
+python3 src/direct.py -r 6 -k 11 -c 6 -a 1 -S 1 -o formulas/direct-6-11-6-A-S5
+head formulas/direct-6-11-6-A-S5.cnf
 ```
 
 We obtain the following output:
@@ -86,14 +90,14 @@ p cnf 935 21220
 The plus encoding needs to be executed in two separate steps.
 The first step consists of specifying the different regions $S_i$ of the encoding (a process we call _"placing"_), and the second part takes the specification of the regions $S_i$ (we call this a _"placement"_) and produces the CNF formula.
 
-**Note**: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
+_Note_: we provide as well the placements used in the paper inside the `placements` folder. So it is possible to skip the placing step and used the pre-generated placement files directly. 
 
 2.1. **Placing**
 
 To create a placement for radius $r$ and $k$ colors, run the following command:
 
 ```
-python3 interactive_encoder.py -r <r> -k <k>
+python3 src/interactive_encoder.py -r <r> -k <k>
 ```
 
 As a result, a new window with a GUI should pop up.
@@ -134,34 +138,53 @@ Once a placement is complete, we need to export it as a file by clicking the `Ex
 Once we have the desired placement file, we will simply use the following Python command to generate an encoding from it.
 
 ```
-python3 from_placement.py -i <placement file> -o <output file> -r <r> -k <k>
+python3 src/from_placement.py -i <placement file> -o <output file> -r <r> -k <k>
 ```
 
 Continuing with our example:
 
 ```
-python3 from_pacement.py -i ../placements/placement-6-11-plus -o p-6-11-plus.cnf -r 6 -k 11
+python3 src/from_pacement.py -i placements/placement-6-11-plus -o formulas/plus-6-11 -r 6 -k 11
 ```
-generates `p-6-11-plus.cnf`. Now it's a good time to test the advantages of our work. By running
+generates `plus-6-11.cnf` in the `formulas` subfolder. Now it's a good time to test the advantages of our work.
 
-```
-cadical d-6-11.cnf
-```
-we obtain an UNSAT result after roughly X hours:
-
-
-By using the plus encoding instead, running
+If we were to run:
 
 ```
-cadical p-6-11-plus.cnf
+cadical formulas/direct-6-11.cnf
 ```
-we obtain the UNSAT result after roughly 11 minutes:
+we would obtain an UNSAT result after several hours.
 
-![Screenshot displaying the time statistics for a CaDiCaL run on p-6-11-plus.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
+Instead, by using the plus encoding instead, we can run
 
-_Note_: Both experiments have been run on my (i.e., Bernardo) personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
+```
+cadical formulas/plus-6-11.cnf
+```
+from which we obtain the UNSAT result after roughly 11 minutes:
 
-_Note 2_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
+![Screenshot displaying the time statistics for a CaDiCaL run on plus-6-11.cnf](/img/time-plus.jpg?raw=true "Time Statistics")
+
+_Note 2_: Both experiments have been run on my (i.e., Bernardo) personal machine (i.e., different than the one used in the paper), a MacBook Pro 2020 with M1 and 16GB of RAM.
+
+_Note 3_: The `from_placement.py` script can take a bunch of other optional arguments. This documentation only covers the basics. By using the `--help` flag you can see a list of the optional arguments and brief descriptions about them.
+
+
+To enable symmetry breaking for $5$ layers (the choice we make in the paper), we proceed exactly as with the direct encoder, by simply adding  the flag `-S 5`.
+So for example after running 
+
+```
+python3 src/from_pacement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-S5 -r 6 -k 11 -S 5
+```
+
+and then running
+
+```
+cadical formulas/plus-6-11-S5.cnf
+```
+
+we obtain the following runtime:
+
+
 
 3. **Cube and Conquer split**
 
@@ -170,20 +193,40 @@ To execute as well the PTR algorithm, is enough to specify the parameters $P$, $
 For example, if we run the following command:
 
 ```
-python3 from_placement.py -i ../placements/placement-6-11 -o p-6-11-plus-P5R5T5 -r 6 -k 11 -P 5 -T 5 -R 5
+python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-P5R5T5 -r 6 -k 11 -P 5 -T 5 -R 5
 ```
-this will generate 7776 cubes, in the file `p-6-11-plus-P5R5T5.icnf`, which can then solve with any incremental solver. For example, using [iLingeling](https://github.com/arminbiere/lingeling), we can run:
+this will generate 7776 cubes, and store them in the file `formulas/plus-6-11-P5R5T5.icnf`, which can then be solved with any incremental solver. For example, using [iLingeling](https://github.com/arminbiere/lingeling), we can run:
 
 ```
-ilingeling p-6-11-plus-P5R5T5.icnf 8 -v 
+ilingeling formulas/plus-6-11-P5R5T5.icnf 8 -v 
 ```
 to use 8 cores. As a result, the wall-clock time of the UNSAT result is barely above a minute! Also, note that even the total runtime is better than before!
 
 ![Screenshot displaying the time statistics for an iLingeling run on p-6-11-plus-P5R5T5.icnf](/img/time-cubes-6-11.png?raw=true "Time Statistics")
 
+4. **Verification**
 
-## TODO
+Here we will cover how to verify a solution for $r = 6$, $k = 11$, using the plus encoding, symmetry breaking and the ALOD clauses.
 
-- [ ] Add a section on Symmetry Breaking in this README
-- [ ] Add a section on Verification in this README
-- [ ] Add more example formulas and placement files
+When we run the encoding command:
+
+```
+python3 src/from_placement.py -i placements/placement-6-11-plus -o formulas/plus-6-11-A-S5 -r 6 -k 11 -a 1 -S 5
+```
+
+several different verification files are automatically generated inside of the `formulas` subfolder:
+
+- `plus-6-11-A-S5.cnf`
+- `plus-6-11-A-S5-alod.drat`
+- `plus-6-11-A-S5.symver`
+
+```
+ppr2drat formulas/direct-6-11.cnf proofs/plus-6-11-A-S5.symver > proofs/proofsym-plus-6-11-A-S5.drat
+cat proofs/proofsym-plus-6-11-A-S5.drat proofs/plus-6-11-A-S5-alod.drat > cb1-plus-6-11-A-S5.drat
+cat cb1-plus-6-11-A-S5.drat proofs/plus-6-11-A-S5.drat > cb2-plus-6-11-A-S5.drat
+cadical formulas/plus-6-11-A-S5.cnf proofs/proof-sol-plus-6-11-A-S5.drat
+cat cb2-plus-6-11-A-S5.drat proofs/proof-sol-plus-6-11-A-S5.drat > proofs/final-plus-6-11-A-S5.drat
+drat-trim formulas/direct-6-11.cnf proofs/final-plus-6-11-A-S5.drat -f
+```
+
+

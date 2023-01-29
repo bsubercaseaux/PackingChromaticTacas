@@ -15,7 +15,7 @@ parser.add_argument('-P', '--positive', type=int, help='max number of positive l
 parser.add_argument('-T', '--splitcolors', type=int, help='number of colors to split')
 parser.add_argument('-R', '--split', type=int, help='number of new variables to use for the split')
 parser.add_argument('-b', '--backcubes', help='puts cubes in reverse order', action='store_true')
-parser.add_argument('-S', '--symmetry', type=int,  help='enables symmetry breaking, 2 for breaking on the 2 highest colors', default=0)
+parser.add_argument('-S', '--symmetry', type=int,  help='enables symmetry breaking for the specified number of layers', default=0)
 parser.add_argument('-a', '--alod', type=int, help='enables ALOD clauses', default=0)
 parser.add_argument('-f', '--foreign', help='foreign clauses', action='store_true')
 parser.add_argument('--symver', help='name for the symmetry verification file', default=None)
@@ -42,7 +42,6 @@ n_new_vars_to_split = args.split
 assert center_force >= -1 and center_force <= n_colors
 border_ones = args.borderones
 chessboard = args.chessboard
-symverfilename = args.symver
 singlecolor = args.singlecolor
 
 if verbose > 0:
@@ -90,7 +89,7 @@ if foreign:
 
 if symmetry:
     symmetry_clauses = structurer.symmetry_breaking()
-    structurer.symmetry_verification(symverfilename)
+    structurer.symmetry_verification('proofs/'+ output_file + ".symver" )
     clauses.extend(symmetry_clauses)
 
 if border_ones:
@@ -129,12 +128,12 @@ def proof_to_file(proof, proof_filename):
 
 cnf = CNF(from_clauses=clauses)
 print(f'# clauses = {len(clauses)}')
-cnf.to_file(output_file + '.cnf')
+cnf.to_file('formulas/' + output_file + '.cnf')
 
 if singlecolor is None:
     if colors_to_split is not None:
         cubes = structurer.cubes(colors_to_split, positive_lits, placement_map, n_new_vars_to_split, reverse_cubes, center_force)
         print(f'# cubes = {len(cubes)}')
-        cubes_to_file(clauses, cubes, output_file + '.icnf')
-    proof_to_file(proof, output_file + '.drat')
-    proof_to_file(alod_proof, output_file + '-alod.drat')
+        cubes_to_file(clauses, cubes, 'formulas/' + output_file + '.icnf')
+    proof_to_file(proof, 'proofs/' + output_file + '.drat')
+    proof_to_file(alod_proof, 'proofs/' + output_file + '-alod.drat')

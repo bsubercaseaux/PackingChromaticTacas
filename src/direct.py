@@ -159,4 +159,4 @@ def write_to_file(clauses, filename):
             print(f"# vars = {len(V)}, # clauses = {len(clauses)}")
 
 
-write_to_file(clauses, filename)
+write_to_file(clauses, filename + '.cnf')
